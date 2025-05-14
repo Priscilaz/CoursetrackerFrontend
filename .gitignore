@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+
+# Dependencias de otros gestores de paquetes
+bower_components/
+
+# Archivos de configuración de Visual Studio Code
+.vscode/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+
+# Archivos de producción (si no los necesitas en el repositorio)
+dist/
+build/
+
+# Entorno de pruebas
+coverage/

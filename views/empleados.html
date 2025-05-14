@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Empleados</title>
+  <link rel="stylesheet" href="/css/empleados.css" />
+</head>
+<body>
+  <h1>📋 Lista de empleados</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Cédula</th>
+        <th>Horas ingresadas</th>
+        <th>Horas usadas</th>
+        <th>Horas disponibles</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="empleados-body"></tbody>
+  </table>
+
+  <h2>➕ Agregar o editar empleado</h2>
+  <form id="empleado-form">
+    <label>Nombre: <input type="text" name="nombre" required /></label><br />
+    <label>Email: <input type="email" name="email" required /></label><br />
+    <label>Cédula: <input type="text" name="cedula" required /></label><br />
+    <label>Horas disponibles: <input type="number" name="horasDisponibles" required /></label><br />
+    <button type="submit">Guardar</button>
+  </form>
+  <section id="sugerencias" style="margin-top: 20px;">
+    <h3>🎯 Cursos sugeridos para el empleado seleccionado</h3>
+    <label for="curso-sugerido">Selecciona un curso recomendado:</label>
+    <select id="curso-sugerido">
+      <option disabled selected>Selecciona un empleado primero</option>
+    </select>
+    <p id="aviso-disponibilidad" style="color: red; font-weight: bold;"></p>
+
+    <button id="asignar-btn" onclick="asignarCurso()">Asignar curso seleccionado</button>
+
+  </section>
+    <section id="asignados" style="margin-top: 20px;">
+    <h3>📚 Cursos asignados</h3>
+    <ul id="lista-asignados"></ul>
+  </section>
+
+
+  <script src="/js/empleados.js"></script>
+</body>
+<a href="/" style="display:inline-block; margin: 15px; padding: 10px 20px; background: #5a4bdb; color: white; text-decoration: none; border-radius: 5px;">
+  ← Volver al Dashboard
+</a>
+
+</html>

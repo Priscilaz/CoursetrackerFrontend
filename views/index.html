@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <nav>
+      <a href="/empleados" class="nav-link">Empleados</a>
+      <a href="/cursos" class="nav-link">Cursos</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-main">
+    <h2>Administrador</h2>
+
+    <section class="card-container">
+      <div class="card chart">
+        <h3>Course Completion</h3>
+        <div class="circle-chart"></div>
+      </div>
+
+      <div class="card chart">
+        <h3>Average Completion Rate by Position</h3>
+        <div class="bar-chart"></div>
+      </div>
+    </section>
+
+    <section class="card-container">
+      <div class="card">
+        <h3>Lista de Cursos</h3>
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Descripción</th><th>Duración (Horas)</th></tr>
+          </thead>
+          <tbody id="tabla-cursos-body">
+
+            
+            <script src="/js/dashboard.js"></script>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!--<div class="card">
+        <h3>User Management</h3>
+        <button class="btn-primary">➕ Agregar usuario</button>
+      </div>-->
+    </section>
+  </main>
+</body>
+</html>

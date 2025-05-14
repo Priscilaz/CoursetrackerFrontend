@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cursos</title>
+  <link rel="stylesheet" href="/css/empleados.css" />
+</head>
+<body>
+  <h1>📚 Lista de cursos</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Duración (horas)</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="cursos-body"></tbody>
+  </table>
+
+  <h2>➕ Agregar o editar curso</h2>
+  <form id="curso-form">
+    <label>Nombre: <input type="text" name="nombre" required /></label><br />
+    <label>Descripción: <input type="text" name="descripcion" required /></label><br />
+    <label>Duración (horas): <input type="number" name="duracionHoras" required /></label><br />
+    <button type="submit">Guardar</button>
+  </form>
+
+  <script src="/js/cursos.js"></script>
+</body>
+<a href="/" style="display:inline-block; margin: 15px; padding: 10px 20px; background: #5a4bdb; color: white; text-decoration: none; border-radius: 5px;">
+  ← Volver al Dashboard
+</a>
+
+</html>
