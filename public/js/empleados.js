@@ -96,7 +96,7 @@ function editarEmpleado(id) {
           horasDisponiblesActuales = emp.horasDisponibles - totalUsadas;
         });
 
-      fetch(`${API_BASE}/cursos/recomendar-cursos/${id}`)
+      fetch(`${API_BASE}/empleados/recomendar-cursos/${id}`)
         .then(res => res.json())
         .then(cursos => {
           const select = document.getElementById('curso-sugerido');
