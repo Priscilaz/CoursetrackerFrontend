@@ -1,16 +1,18 @@
 let idActual = null;
 let horasDisponiblesActuales = 0;
 
-// ✅ NUEVO: función para recargar la tabla
+const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
+
+
 async function cargarTablaEmpleados() {
   const tbody = document.getElementById('empleados-body');
   tbody.innerHTML = '';
 
-  const res = await fetch('/api/empleados');
+  const res = await fetch(`${API_BASE}/empleados/listar`);
   const data = await res.json();
 
   for (const e of data) {
-    const resCursos = await fetch(`/api/EmpleadoCurso/empleado/${e.empleadoId}`);
+    const resCursos = await fetch(`${API_BASE}/EmpleadoCurso/empleado/${e.empleadoId}`);
     const cursos = await resCursos.json();
     const horasUsadas = cursos.reduce((sum, curso) => sum + curso.duracionHoras, 0);
     const horasDisponibles = e.horasDisponibles - horasUsadas;
@@ -49,7 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const method = idActual ? 'PUT' : 'POST';
-    const url = idActual ? `/api/empleados/editar/${idActual}` : `/api/empleados/crear`;
+    const url = idActual
+      ? `${API_BASE}/empleados/editar/${idActual}`
+      : `${API_BASE}/empleados/crear`;
 
     try {
       const response = await fetch(url, {
@@ -63,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(idActual ? 'Empleado actualizado ✅' : 'Empleado creado ✅');
       idActual = null;
       form.reset();
-      cargarTablaEmpleados(); // ✅ actualiza tabla sin recargar página
+      cargarTablaEmpleados();
     } catch (err) {
       console.error(err);
       alert('Error al guardar empleado ❌');
@@ -72,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function editarEmpleado(id) {
-  fetch('/api/empleados')
+  fetch(`${API_BASE}/empleados/listar`)
     .then(res => res.json())
     .then(data => {
       const emp = data.find(e => e.empleadoId === id);
@@ -85,16 +89,14 @@ function editarEmpleado(id) {
 
       idActual = id;
 
-      // calcular horas disponibles reales
-      fetch(`/api/EmpleadoCurso/empleado/${id}`)
+      fetch(`${API_BASE}/EmpleadoCurso/empleado/${id}`)
         .then(res => res.json())
         .then(cursos => {
           const totalUsadas = cursos.reduce((sum, c) => sum + c.duracionHoras, 0);
           horasDisponiblesActuales = emp.horasDisponibles - totalUsadas;
         });
 
-      // cursos sugeridos
-      fetch(`/api/cursos/recomendados/${id}`)
+      fetch(`${API_BASE}/cursos/recomendados/${id}`)
         .then(res => res.json())
         .then(cursos => {
           const select = document.getElementById('curso-sugerido');
@@ -121,7 +123,7 @@ function editarEmpleado(id) {
 }
 
 function mostrarCursosAsignados(idEmpleado) {
-  fetch(`/api/empleadocurso/empleado/${idEmpleado}`)
+  fetch(`${API_BASE}/EmpleadoCurso/empleado/${idEmpleado}`)
     .then(res => res.json())
     .then(cursos => {
       const lista = document.getElementById('lista-asignados');
@@ -166,13 +168,13 @@ function mostrarCursosAsignados(idEmpleado) {
 function eliminarEmpleado(id) {
   if (!confirm('¿Estás seguro de eliminar este empleado?')) return;
 
-  fetch(`/api/empleados/eliminar/${id}`, {
+  fetch(`${API_BASE}/empleados/eliminar/${id}`, {
     method: 'DELETE'
   })
     .then(res => {
       if (!res.ok) throw new Error('Falló la eliminación');
       alert('Empleado eliminado ✅');
-      cargarTablaEmpleados(); // ✅ refrescar tabla automáticamente
+      cargarTablaEmpleados();
     })
     .catch(err => {
       console.error(err);
@@ -199,7 +201,7 @@ function asignarCurso() {
 
   const payload = { empleadoId: idActual, cursoId };
 
-  fetch('/api/EmpleadoCurso/asignar', {
+  fetch(`${API_BASE}/EmpleadoCurso/asignar`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -211,7 +213,7 @@ function asignarCurso() {
     .then(() => {
       alert('Curso asignado correctamente ✅');
       mostrarCursosAsignados(idActual);
-      cargarTablaEmpleados(); // ✅ actualiza tabla al instante
+      cargarTablaEmpleados();
     })
     .catch(err => {
       console.error('Error al asignar curso:', err);

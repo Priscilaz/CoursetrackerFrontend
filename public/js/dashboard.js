@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('/api/cursos')
+  const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
+
+  fetch(`${API_BASE}/cursos/listar`)
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('tabla-cursos-body');

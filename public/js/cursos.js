@@ -1,6 +1,8 @@
 let cursoIdActual = null;
 
-fetch('/api/cursos')
+const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
+
+fetch(`${API_BASE}/cursos/listar`)
   .then(res => res.json())
   .then(data => {
     const tbody = document.getElementById('cursos-body');
@@ -30,22 +32,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formData = new FormData(form);
     const nuevoCurso = {
-    nombre: formData.get('nombre'),
-    descripcion: formData.get('descripcion'),
-    duracionHoras: Number(formData.get('duracionHoras'))
+      nombre: formData.get('nombre'),
+      descripcion: formData.get('descripcion'),
+      duracionHoras: Number(formData.get('duracionHoras'))
     };
 
     const cursoIdNum = parseInt(cursoIdActual);
     if (!isNaN(cursoIdNum)) {
-    nuevoCurso.cursoId = cursoIdNum;
+      nuevoCurso.cursoId = cursoIdNum;
     }
-    console.log('Datos enviados a /crear o /editar:', nuevoCurso);
-
 
     const method = cursoIdActual ? 'PUT' : 'POST';
     const url = cursoIdActual
-      ? `/api/cursos/editar/${cursoIdActual}`
-      : '/api/cursos/crear';
+      ? `${API_BASE}/cursos/editar/${cursoIdActual}`
+      : `${API_BASE}/cursos/crear`;
 
     try {
       const response = await fetch(url, {
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function editarCurso(id) {
-  fetch('/api/cursos')
+  fetch(`${API_BASE}/cursos/listar`)
     .then(res => res.json())
     .then(data => {
       const curso = data.find(c => c.cursoId == id);
@@ -85,7 +85,7 @@ function editarCurso(id) {
 function eliminarCurso(id) {
   if (!confirm('¿Estás seguro de eliminar este curso?')) return;
 
-  fetch(`/api/cursos/eliminar/${id}`, {
+  fetch(`${API_BASE}/cursos/eliminar/${id}`, {
     method: 'DELETE'
   })
     .then(res => {
