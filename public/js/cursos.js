@@ -9,12 +9,12 @@ const infoCurso = document.getElementById('info-curso');
 const cursosBody = document.getElementById('cursos-body');
 
 // 1. Botón “Nuevo curso”: limpia el formulario y resetea el estado
-btnNuevoCurso.addEventListener('click', (e) => {
+/*btnNuevoCurso.addEventListener('click', (e) => {
   e.preventDefault();
   cursoIdActual = null;
   formCurso.reset();
   infoCurso.innerText = 'Agregar nuevo curso';
-});
+});*/
 
 // 2. Cargar la tabla de cursos
 async function cargarTablaCursos() {
