@@ -3,44 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <title>Cursos</title>
-  <link rel="stylesheet" href="/css/empleados.css" />
-  <style>
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    th {
-      background: #f4f4f4;
-    }
-    button {
-      margin-right: 0.25rem;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 1rem;
-    }
-    section {
-      margin-top: 2rem;
-    }
-  </style>
+  <!-- Ahora enlazamos nuestro CSS separado -->
+  <link rel="stylesheet" href="/css/cursos.css" />
 </head>
 <body>
   <h1>📚 Lista de cursos</h1>
 
-  <!-- Botón “Nuevo curso”
-  <button id="btn-nuevo-curso" style="margin-bottom: 1rem; padding: 0.5rem 1rem;">
-    ➕ Nuevo curso
-  </button>-->
-
   <!-- Tabla de cursos -->
-  <table>
+  <table class="tabla-cursos">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -50,14 +20,14 @@
       </tr>
     </thead>
     <tbody id="cursos-body">
-      
+      <!-- Se llenará dinámicamente con JS -->
     </tbody>
   </table>
 
   <!-- Formulario para Crear / Editar -->
-  <section>
+  <section class="seccion-formulario">
     <h3>➕ Crear / ✏️ Editar curso</h3>
-    <form id="curso-form">
+    <form id="curso-form" class="form-curso">
       <label>
         Nombre:
         <input type="text" name="nombre" id="nombre" required />
@@ -73,16 +43,14 @@
         <input type="number" name="duracionHoras" id="duracionHoras" step="0.01" required />
       </label>
       <br /><br />
-      <button type="submit">Guardar</button>
-      <span id="info-curso" style="margin-left: 1rem; font-style: italic; color: #555;">
-      
-        Agregar nuevo curso
-      </span>
+      <!-- Botón “Guardar” con la misma clase que usamos en Empleados -->
+      <button type="submit" class="btn-guardar">Guardar</button>
+      <span id="info-curso" class="info-texto">Agregar nuevo curso</span>
     </form>
   </section>
 
   <!-- Enlace para volver al Dashboard -->
-  <a href="/" style="display:inline-block; margin: 15px; padding: 10px 15px; background: #4b74db; color: white; text-decoration: none; border-radius: 5px;">
+  <a href="/" class="btn-guardar enlace-dashboard">
     ← Volver al Dashboard
   </a>
 

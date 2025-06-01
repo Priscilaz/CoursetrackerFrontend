@@ -1,4 +1,5 @@
-.btn-primario {
+
+.btn-guardar {
   padding: 0.5rem 1rem;
   background: #4b74db;
   color: white;
@@ -6,49 +7,54 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
-  text-decoration: none; /* Para que el <a> no subraye */
-  display: inline-block;
+  text-decoration: none; /* Para <a> sin subrayado */
 }
 
 /* Enlace “Volver al Dashboard” */
 .enlace-dashboard {
+  display: inline-block;
   margin: 15px;
-  border-radius: 5px;
 }
 
 
 
-.tabla-empleados {
+.tabla-cursos {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
 }
 
-.tabla-empleados th,
-.tabla-empleados td {
+.tabla-cursos th,
+.tabla-cursos td {
   border: 1px solid #ccc;
   padding: 0.5rem;
   text-align: left;
 }
 
-.tabla-empleados th {
+.tabla-cursos th {
   background: #f4f4f4;
 }
 
 
+.tabla-cursos button {
+  margin-right: 0.25rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
 
-/* Separa las secciones verticalmente */
+
 .seccion-formulario {
   margin-top: 2rem;
 }
 
-/* Etiquetas margin para inputs dentro del formulario */
-.form-empleado label {
+.form-curso label {
   display: block;
   margin-bottom: 0.5rem;
 }
 
-/* Texto informativo en itálica (Agregar/Editar) */
+
 .info-texto {
   margin-left: 1rem;
   font-style: italic;
@@ -56,18 +62,14 @@
 }
 
 
-
-/* Márgenes y ancho mínimo del select */
-.select-cursos {
-  min-width: 200px;
-  margin-right: 0.5rem;
+.form-curso input {
   padding: 0.3rem 0.5rem;
   font-size: 1rem;
 }
 
 
 
-a.btn-primario:hover,
-button.btn-primario:hover {
-  background: #3a5bb8; /* Variante un poco más oscura del azul */
+.btn-guardar:hover,
+.tabla-cursos button:hover {
+  background: #3a5bb8; 
 }

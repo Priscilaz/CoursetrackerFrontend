@@ -3,42 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Empleados</title>
+  <!-- Ya no hay <style> embebido; apuntamos a nuestro CSS separado -->
   <link rel="stylesheet" href="/css/empleados.css" />
-  <style>
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    th {
-      background: #f4f4f4;
-    }
-    button {
-      margin-right: 0.25rem;
-      cursor: pointer;
-    }
-   
-    section {
-      margin-top: 2rem;
-    }
-  </style>
 </head>
 <body>
   <h1>📋 Lista de empleados</h1>
 
-  <!-- Botón “Nuevo empleado” -->
-  <button id="btn-nuevo-empleado" style="margin-bottom: 1rem; padding: 0.5rem 1rem;">
+  <!-- Botón “Nuevo empleado” sin estilos inline (usa clases definidas en empleados.css) -->
+  <button id="btn-nuevo-empleado" class="btn-primario">
     ➕ Nuevo empleado
   </button>
 
   <!-- Tabla de Empleados -->
-  <table>
+  <table class="tabla-empleados">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -49,14 +26,14 @@
       </tr>
     </thead>
     <tbody id="empleados-body">
-      
+      <!-- Se rellenará dinámicamente desde JS -->
     </tbody>
   </table>
 
   <!-- Formulario para Crear / Editar -->
-  <section>
+  <section class="seccion-formulario">
     <h3>➕ Crear / ✏️ Editar empleado</h3>
-    <form id="empleado-form">
+    <form id="empleado-form" class="form-empleado">
       <label>
         Nombre:
         <input type="text" name="nombre" id="nombre" required />
@@ -77,23 +54,24 @@
         <input type="number" name="horasDisponibles" id="horasDisponibles" step="0.01" required />
       </label>
       <br /><br />
-      <button type="submit">Guardar</button>
-      <span id="info-empleado" style="margin-left: 1rem; font-style: italic; color: #555;">
+      <!-- Botón “Guardar” usando misma clase que “Nuevo empleado” -->
+      <button type="submit" class="btn-primario">Guardar</button>
+      <span id="info-empleado" class="info-texto">
         Agregar un nuevo empleado
       </span>
     </form>
   </section>
 
   <!-- Sección Asignar Cursos -->
-  <section id="asignar-curso">
+  <section id="asignar-curso" class="seccion-formulario">
     <h3>📌 Asignar curso a empleado</h3>
     <p id="info-seleccion-empleado">Selecciona un empleado para asignar cursos</p>
-    <select id="curso-sugerido" style="min-width: 200px; margin-right: 0.5rem;"></select>
-    <button id="btn-asignar">Asignar curso</button>
+    <select id="curso-sugerido" class="select-cursos"></select>
+    <button id="btn-asignar" class="btn-primario">Asignar curso</button>
   </section>
 
   <!-- Sección Cursos Asignados -->
-  <section id="asignados">
+  <section id="asignados" class="seccion-formulario">
     <h3>📚 Cursos asignados</h3>
     <ul id="lista-asignados"></ul>
     <p id="total-horas"></p>
@@ -102,8 +80,8 @@
   <!-- Script principal -->
   <script src="/js/empleados.js"></script>
 
-  <!-- Enlace para volver al Dashboard -->
-  <a href="/" style="display:inline-block; margin: 15px; padding: 10px 15px; background: #4b74db; color: white; text-decoration: none; border-radius: 5px;">
+  <!-- Enlace para volver al Dashboard (sin estilos inline, usa clase para apariencia) -->
+  <a href="/" class="btn-primario enlace-dashboard">
     ← Volver al Dashboard
   </a>
 </body>
