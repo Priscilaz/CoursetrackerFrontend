@@ -4,10 +4,40 @@
   <meta charset="UTF-8" />
   <title>Empleados</title>
   <link rel="stylesheet" href="/css/empleados.css" />
+  <style>
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+    }
+    button {
+      margin-right: 0.25rem;
+      cursor: pointer;
+    }
+   
+    section {
+      margin-top: 2rem;
+    }
+  </style>
 </head>
 <body>
   <h1>📋 Lista de empleados</h1>
 
+  <!-- Botón “Nuevo empleado” -->
+  <button id="btn-nuevo-empleado" style="margin-bottom: 1rem; padding: 0.5rem 1rem;">
+    ➕ Nuevo empleado
+  </button>
+
+  <!-- Tabla de Empleados -->
   <table>
     <thead>
       <tr>
@@ -18,52 +48,61 @@
         <th>Acciones</th>
       </tr>
     </thead>
-    <tbody id="empleados-body"></tbody>
+    <tbody id="empleados-body">
+      
+    </tbody>
   </table>
 
-  <section style="margin-top: 20px;">
-    <h3>➕ Crear / Editar empleado</h3>
+  <!-- Formulario para Crear / Editar -->
+  <section>
+    <h3>➕ Crear / ✏️ Editar empleado</h3>
     <form id="empleado-form">
       <label>
         Nombre:
-        <input type="text" name="nombre" required />
-      </label><br />
-
+        <input type="text" name="nombre" id="nombre" required />
+      </label>
+      <br /><br />
       <label>
         Email:
-        <input type="email" name="email" required />
-      </label><br />
-
+        <input type="email" name="email" id="email" required />
+      </label>
+      <br /><br />
       <label>
         Cédula:
-        <input type="text" name="cedula" required />
-      </label><br />
-
+        <input type="text" name="cedula" id="cedula" required />
+      </label>
+      <br /><br />
       <label>
         Horas disponibles:
-       
-        <input type="number" name="horasDisponibles" step="0.01" required />
-      </label><br />
-
+        <input type="number" name="horasDisponibles" id="horasDisponibles" step="0.01" required />
+      </label>
+      <br /><br />
       <button type="submit">Guardar</button>
+      <span id="info-empleado" style="margin-left: 1rem; font-style: italic; color: #555;">
+        Agregar un nuevo empleado
+      </span>
     </form>
   </section>
 
-  <section id="asignar-curso" style="margin-top: 20px;">
-    <h3>Asignar curso a empleado</h3>
-    <p id="info-empleado">Selecciona un empleado para asignar cursos</p>
-    <select id="curso-sugerido"></select>
+  <!-- Sección Asignar Cursos -->
+  <section id="asignar-curso">
+    <h3>📌 Asignar curso a empleado</h3>
+    <p id="info-seleccion-empleado">Selecciona un empleado para asignar cursos</p>
+    <select id="curso-sugerido" style="min-width: 200px; margin-right: 0.5rem;"></select>
     <button id="btn-asignar">Asignar curso</button>
   </section>
 
-  <section id="asignados" style="margin-top: 20px;">
+  <!-- Sección Cursos Asignados -->
+  <section id="asignados">
     <h3>📚 Cursos asignados</h3>
     <ul id="lista-asignados"></ul>
     <p id="total-horas"></p>
   </section>
 
+  <!-- Script principal -->
   <script src="/js/empleados.js"></script>
 
+  <!-- Enlace para volver al Dashboard -->
   <a href="/" style="display:inline-block; margin: 15px; padding: 10px 15px; background: #4b74db; color: white; text-decoration: none; border-radius: 5px;">
     ← Volver al Dashboard
   </a>

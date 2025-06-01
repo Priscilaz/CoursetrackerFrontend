@@ -3,212 +3,274 @@ let horasDisponiblesActuales = 0;
 
 const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
 
+// 1. Botón “Nuevo empleado”
+const btnNuevo = document.getElementById('btn-nuevo-empleado');
+const form = document.getElementById('empleado-form');
+const infoEmpleado = document.getElementById('info-empleado');
+const infoSeleccionEmpleado = document.getElementById('info-seleccion-empleado');
+const selectCursos = document.getElementById('curso-sugerido');
+const listaAsignados = document.getElementById('lista-asignados');
+const totalHorasElem = document.getElementById('total-horas');
+
+btnNuevo.addEventListener('click', (e) => {
+  e.preventDefault();
+  // Limpiar estado de edición
+  idActual = null;
+  // Limpiar formulario
+  form.reset();
+  // Restaurar texto
+  infoEmpleado.innerText = 'Agregar un nuevo empleado';
+  // Limpiar sección de cursos asignados
+  infoSeleccionEmpleado.innerText = 'Selecciona un empleado para asignar cursos';
+  selectCursos.innerHTML = '';
+  listaAsignados.innerHTML = '';
+  totalHorasElem.innerText = '';
+  horasDisponiblesActuales = 0;
+});
+
+// 2. Cargar la tabla de empleados
 async function cargarTablaEmpleados() {
   const tbody = document.getElementById('empleados-body');
   tbody.innerHTML = '';
 
-  
-  const res = await fetch(`${API_BASE}/empleados`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`${API_BASE}/empleados`);
+    if (!res.ok) throw new Error('No se pudo cargar la lista de empleados');
+    const data = await res.json();
 
-  for (const e of data) {
-   
-    const resCursos = await fetch(`${API_BASE}/EmpleadoCurso/empleado/${e.empleadoId}`);
-    const cursos = await resCursos.json();
-
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${e.nombre}</td>
-      <td>${e.email}</td>
-      <td>${e.cedula}</td>
-      <td>${e.horasDisponibles.toFixed(2)}</td>
-      <td>
-        <button onclick="seleccionarEmpleado(${e.empleadoId}, ${e.horasDisponibles})">
-          Ver Cursos
-        </button>
-        <button onclick="cargarEmpleadoParaEditar(${e.empleadoId})">
-          ✏️
-        </button>
-        <button onclick="eliminarEmpleado(${e.empleadoId})">
-          🗑️
-        </button>
-      </td>
-    `;
-    tbody.appendChild(fila);
+    data.forEach(e => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${e.nombre}</td>
+        <td>${e.email}</td>
+        <td>${e.cedula}</td>
+        <td>${e.horasDisponibles.toFixed(2)}</td>
+        <td>
+          <button onclick="seleccionarEmpleado(${e.empleadoId}, ${e.horasDisponibles})">
+            Ver Cursos
+          </button>
+          <button onclick="cargarEmpleadoParaEditar(${e.empleadoId})">
+            ✏️
+          </button>
+          <button onclick="eliminarEmpleado(${e.empleadoId})">
+            🗑️
+          </button>
+        </td>
+      `;
+      tbody.appendChild(fila);
+    });
+  } catch (err) {
+    console.error(err);
+    alert('Error al cargar empleados ❌\n' + err.message);
   }
 }
 
+// 3. Cargar datos de un empleado en el formulario para editar
 async function cargarEmpleadoParaEditar(id) {
-  const res = await fetch(`${API_BASE}/empleados/${id}`);
-  if (!res.ok) {
-    alert('No se pudo cargar el empleado para editar.');
-    return;
+  try {
+    const res = await fetch(`${API_BASE}/empleados/${id}`);
+    if (!res.ok) throw new Error('Empleado no encontrado');
+    const e = await res.json();
+    // Guardar id en modo edición
+    idActual = e.empleadoId;
+    // Rellenar inputs
+    document.getElementById('nombre').value = e.nombre;
+    document.getElementById('email').value = e.email;
+    document.getElementById('cedula').value = e.cedula;
+    document.getElementById('horasDisponibles').value = e.horasDisponibles.toFixed(2);
+    // Actualizar texto en formulario
+    infoEmpleado.innerText = `Editando empleado ID: ${id}`;
+  } catch (err) {
+    console.error(err);
+    alert('Error al cargar empleado para editar ❌\n' + err.message);
   }
-  const e = await res.json();
-  idActual = e.empleadoId;
-  document.getElementById('nombre').value = e.nombre;
-  document.getElementById('email').value = e.email;
-  document.getElementById('cedula').value = e.cedula;
-  document.getElementById('horasDisponibles').value = e.horasDisponibles;
 }
 
+// 4. Eliminar empleado
 async function eliminarEmpleado(id) {
   if (!confirm('¿Estás seguro de eliminar este empleado?')) return;
 
-  
-  const res = await fetch(`${API_BASE}/empleados/${id}`, {
-    method: 'DELETE'
-  });
-  if (!res.ok) {
-    alert('Error al eliminar empleado ❌');
-    return;
+  try {
+    const res = await fetch(`${API_BASE}/empleados/${id}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) {
+      const texto = await res.text();
+      throw new Error(texto || 'No se pudo eliminar');
+    }
+    alert('Empleado eliminado ✅');
+    // Si estábamos editando este mismo empleado, resetear formulario
+    if (idActual === id) {
+      idActual = null;
+      form.reset();
+      infoEmpleado.innerText = 'Agregar un nuevo empleado';
+      infoSeleccionEmpleado.innerText = 'Selecciona un empleado para asignar cursos';
+      selectCursos.innerHTML = '';
+      listaAsignados.innerHTML = '';
+      totalHorasElem.innerText = '';
+      horasDisponiblesActuales = 0;
+    }
+    cargarTablaEmpleados();
+  } catch (err) {
+    console.error(err);
+    alert('Error al eliminar empleado ❌\n' + err.message);
   }
-  alert('Empleado eliminado ✅');
-  cargarTablaEmpleados();
 }
 
+// 5. Ver cursos y sugerir nuevos
 async function seleccionarEmpleado(id, horasDisponibles) {
   idActual = id;
   horasDisponiblesActuales = horasDisponibles;
-  document.getElementById('info-empleado').innerText =
-    `Empleado ID: ${id} - Horas disponibles: ${horasDisponibles.toFixed(2)}`;
+  infoSeleccionEmpleado.innerText = `Empleado ID: ${id} - Horas disponibles: ${horasDisponibles.toFixed(2)}`;
 
-  // Mostrar cursos asignados
-  mostrarCursosAsignados(id);
+  // 5.1. Mostrar cursos asignados
+  try {
+    const resCursosAsignados = await fetch(`${API_BASE}/EmpleadoCurso/empleado/${id}`);
+    if (!resCursosAsignados.ok) throw new Error('No se pudo cargar cursos asignados');
+    const cursosAsignados = await resCursosAsignados.json();
 
-  // Cargar cursos sugeridos (duración ≤ horasDisponibles)
- 
-  const respuesta = await fetch(`${API_BASE}/empleados/${id}/cursos-recomendados`);
-  const cursos = await respuesta.json();
+    listaAsignados.innerHTML = '';
+    let total = 0;
+    if (cursosAsignados.length === 0) {
+      listaAsignados.innerHTML = '<li>Sin cursos asignados</li>';
+    } else {
+      cursosAsignados.forEach(curso => {
+        total += curso.duracionHoras;
+        const li = document.createElement('li');
+        li.textContent = `${curso.nombre} - ${curso.duracionHoras}h`;
+        listaAsignados.appendChild(li);
+      });
+    }
+    totalHorasElem.innerText = `Total horas asignadas: ${total.toFixed(2)}h`;
+  } catch (err) {
+    console.error(err);
+    alert('Error al cargar cursos asignados ❌\n' + err.message);
+    listaAsignados.innerHTML = '';
+    totalHorasElem.innerText = '';
+  }
 
-  const select = document.getElementById('curso-sugerido');
-  select.innerHTML = ''; // limpiar
+  // 5.2. Cargar cursos sugeridos (duración ≤ horasDisponibles)
+  try {
+    const resSugeridos = await fetch(`${API_BASE}/empleados/${id}/cursos-recomendados`);
+    if (!resSugeridos.ok) throw new Error('No se pudieron obtener cursos recomendados');
+    const cursosSugeridos = await resSugeridos.json();
 
-  if (!Array.isArray(cursos) || cursos.length === 0) {
-    const option = document.createElement('option');
-    option.textContent = '-- Sin cursos disponibles --';
-    option.disabled = true;
-    select.appendChild(option);
+    selectCursos.innerHTML = '';
+    if (!Array.isArray(cursosSugeridos) || cursosSugeridos.length === 0) {
+      const option = document.createElement('option');
+      option.textContent = '-- Sin cursos disponibles --';
+      option.disabled = true;
+      selectCursos.appendChild(option);
+    } else {
+      cursosSugeridos.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.cursoId;
+        opt.textContent = `${c.nombre} (${c.duracionHoras}h)`;
+        selectCursos.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error al cargar cursos sugeridos ❌\n' + err.message);
+    selectCursos.innerHTML = '';
+  }
+}
+
+// 6. Manejar envío del formulario (Crear o Editar)
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  // Construir payload
+  const nuevoEmpleado = {
+    nombre: formData.get('nombre'),
+    email: formData.get('email'),
+    cedula: formData.get('cedula'),
+    horasDisponibles: parseFloat(formData.get('horasDisponibles')),
+    empleadoCursos: []
+  };
+
+  // Si estamos en modo edición, añadimos empleadoId
+  if (idActual) {
+    nuevoEmpleado.empleadoId = idActual;
+  }
+
+  const method = idActual ? 'PUT' : 'POST';
+  const url = idActual
+    ? `${API_BASE}/empleados/${idActual}`
+    : `${API_BASE}/empleados`;
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevoEmpleado)
+    });
+    if (!response.ok) {
+      const errTxt = await response.text();
+      throw new Error(errTxt);
+    }
+    alert(idActual ? 'Empleado actualizado ✅' : 'Empleado creado ✅');
+    // Limpiar formulario y estado
+    form.reset();
+    idActual = null;
+    infoEmpleado.innerText = 'Agregar un nuevo empleado';
+    cargarTablaEmpleados();
+  } catch (error) {
+    console.error('Error al guardar empleado:', error);
+    alert('Error al guardar empleado ❌\n' + error.message);
+  }
+});
+
+// 7. Asignar curso al empleado seleccionado
+document.getElementById('btn-asignar').addEventListener('click', async () => {
+  if (!idActual) {
+    alert('Primero selecciona un empleado para asignar un curso.');
     return;
   }
 
-  cursos.forEach(c => {
-    const option = document.createElement('option');
-    option.value = c.cursoId;
-    option.textContent = `${c.nombre} (${c.duracionHoras}h)`;
-    select.appendChild(option);
-  });
-}
+  const cursoElegido = selectCursos.value;
+  if (!cursoElegido) {
+    alert('Por favor selecciona un curso.');
+    return;
+  }
 
-function mostrarCursosAsignados(idEmpleado) {
-  fetch(`${API_BASE}/EmpleadoCurso/empleado/${idEmpleado}`)
-    .then(res => res.json())
-    .then(cursos => {
-      const lista = document.getElementById('lista-asignados');
-      lista.innerHTML = '';
-      let total = 0;
+  // Extraer duración decimal de “(Xh)”
+  const texto = selectCursos.selectedOptions[0].textContent;
+  const match = texto.match(/\((\d+(\.\d+)?)h\)/);
+  const duracion = match ? parseFloat(match[1]) : 0;
 
-      if (cursos.length === 0) {
-        lista.innerHTML = '<li>Sin cursos asignados</li>';
-      } else {
-        cursos.forEach(c => {
-          total += c.duracionHoras;
-          const li = document.createElement('li');
-          li.textContent = `${c.nombre} - ${c.duracionHoras}h`;
-          lista.appendChild(li);
-        });
-      }
+  if (duracion > horasDisponiblesActuales) {
+    alert('⛔ El curso seleccionado excede las horas disponibles del empleado');
+    return;
+  }
 
-      document.getElementById('total-horas').innerText =
-        `Total horas asignadas: ${total.toFixed(2)}h`;
-    })
-    .catch(err => {
-      console.error('Error al cargar cursos asignados:', err);
-    });
-}
+  const payload = {
+    empleadoId: idActual,
+    cursoId: parseInt(cursoElegido)
+  };
 
-document.addEventListener('DOMContentLoaded', () => {
-  cargarTablaEmpleados();
-
-  const form = document.getElementById('empleado-form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const nuevoEmpleado = {
-      nombre: formData.get('nombre'),
-      email: formData.get('email'),
-      cedula: formData.get('cedula'),
-      // parseFloat para aceptar decimales
-      horasDisponibles: parseFloat(formData.get('horasDisponibles')),
-      empleadoCursos: [] 
-    };
-
-    const method = idActual ? 'PUT' : 'POST';
-    
-    const url = idActual
-      ? `${API_BASE}/empleados/${idActual}`
-      : `${API_BASE}/empleados`;
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoEmpleado)
-      });
-      if (!response.ok) {
-        const errTxt = await response.text();
-        throw new Error(errTxt);
-      }
-      alert(idActual ? 'Empleado actualizado ✅' : 'Empleado creado ✅');
-      form.reset();
-      idActual = null;
-      cargarTablaEmpleados();
-    } catch (error) {
-      console.error('Error al guardar empleado:', error);
-      alert('Error al guardar empleado ❌\n' + error.message);
-    }
-  });
-
-  document.getElementById('btn-asignar').addEventListener('click', () => {
-    const cursoElegido = document.getElementById('curso-sugerido').value;
-    if (!cursoElegido) {
-      alert('Por favor selecciona un curso.');
-      return;
-    }
-
-    // Extraer número decimal de “(Xh)”
-    const texto = document.getElementById('curso-sugerido').selectedOptions[0].textContent;
-    const match = texto.match(/\((\d+(\.\d+)?)h\)/); // captura “X” o “X.Y”
-    const duracion = match ? parseFloat(match[1]) : 0;
-
-    if (duracion > horasDisponiblesActuales) {
-      alert('⛔ El curso seleccionado excede las horas disponibles del empleado');
-      return;
-    }
-
-    const payload = {
-      empleadoId: idActual,
-      cursoId: parseInt(cursoElegido)
-    };
-
-    fetch(`${API_BASE}/EmpleadoCurso/asignar`, {
+  try {
+    const res = await fetch(`${API_BASE}/EmpleadoCurso/asignar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    })
-      .then(res => {
-        if (!res.ok) return res.text().then(t => { throw new Error(t); });
-        return res.json();
-      })
-      .then(() => {
-        alert('Curso asignado correctamente ✅');
-        mostrarCursosAsignados(idActual);
-        cargarTablaEmpleados();
-      })
-      .catch(err => {
-        console.error('Error al asignar curso:', err);
-        alert('Error al asignar curso ❌\n' + err.message);
-      });
-  });
+    });
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg);
+    }
+    alert('Curso asignado correctamente ✅');
+    // Refrescar sección de cursos asignados y tabla de empleados
+    seleccionarEmpleado(idActual, horasDisponiblesActuales);
+    cargarTablaEmpleados();
+  } catch (err) {
+    console.error('Error al asignar curso:', err);
+    alert('Error al asignar curso ❌\n' + err.message);
+  }
+});
+
+// 8. Iniciar cargando la tabla cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  cargarTablaEmpleados();
 });
