@@ -2,7 +2,7 @@ let cursoIdActual = null;
 
 const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
 
-
+// Referencias al DOM
 const btnNuevoCurso = document.getElementById('btn-nuevo-curso');
 const formCurso = document.getElementById('curso-form');
 const infoCurso = document.getElementById('info-curso');
@@ -89,11 +89,12 @@ formCurso.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const formData = new FormData(formCurso);
-  // Construir payload
+  // Construir payload, incluyendo siempre empleadoCursos: []
   const nuevoCurso = {
     nombre: formData.get('nombre'),
     descripcion: formData.get('descripcion'),
-    duracionHoras: parseFloat(formData.get('duracionHoras'))
+    duracionHoras: parseFloat(formData.get('duracionHoras')),
+    empleadoCursos: []
   };
 
   // Determinar método y URL
