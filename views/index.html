@@ -14,42 +14,24 @@
     </nav>
   </header>
 
-  <main class="dashboard-main">
-    <h2>Administrador</h2>
-
-    <section class="card-container">
-      <div class="card chart">
-        <h3>Course Completion</h3>
-        <div class="circle-chart"></div>
-      </div>
-
-      <div class="card chart">
-        <h3>Average Completion Rate by Position</h3>
-        <div class="bar-chart"></div>
-      </div>
-    </section>
-
-    <section class="card-container">
-      <div class="card">
-        <h3>Lista de Cursos</h3>
-        <table>
-          <thead>
-            <tr><th>Nombre</th><th>Descripción</th><th>Duración (Horas)</th></tr>
-          </thead>
-          <tbody id="tabla-cursos-body">
-
-            
-            <script src="/js/dashboard.js"></script>
-
-          </tbody>
-        </table>
-      </div>
-
-      <!--<div class="card">
-        <h3>User Management</h3>
-        <button class="btn-primary">➕ Agregar usuario</button>
-      </div>-->
+  <main>
+    <section>
+      <h2>Vista rápida de cursos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Duración</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-cursos-body">
+          
+        </tbody>
+      </table>
     </section>
   </main>
+
+  <script src="/js/dashboard.js"></script>
 </body>
 </html>

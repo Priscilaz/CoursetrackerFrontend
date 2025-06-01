@@ -14,8 +14,6 @@
         <th>Nombre</th>
         <th>Email</th>
         <th>Cédula</th>
-        <th>Horas ingresadas</th>
-        <th>Horas usadas</th>
         <th>Horas disponibles</th>
         <th>Acciones</th>
       </tr>
@@ -23,35 +21,51 @@
     <tbody id="empleados-body"></tbody>
   </table>
 
-  <h2>➕ Agregar o editar empleado</h2>
-  <form id="empleado-form">
-    <label>Nombre: <input type="text" name="nombre" required /></label><br />
-    <label>Email: <input type="email" name="email" required /></label><br />
-    <label>Cédula: <input type="text" name="cedula" required /></label><br />
-    <label>Horas disponibles: <input type="number" name="horasDisponibles" required /></label><br />
-    <button type="submit">Guardar</button>
-  </form>
-  <section id="sugerencias" style="margin-top: 20px;">
-    <h3>🎯 Cursos sugeridos para el empleado seleccionado</h3>
-    <label for="curso-sugerido">Selecciona un curso recomendado:</label>
-    <select id="curso-sugerido">
-      <option disabled selected>Selecciona un empleado primero</option>
-    </select>
-    <p id="aviso-disponibilidad" style="color: red; font-weight: bold;"></p>
+  <section style="margin-top: 20px;">
+    <h3>➕ Crear / Editar empleado</h3>
+    <form id="empleado-form">
+      <label>
+        Nombre:
+        <input type="text" name="nombre" required />
+      </label><br />
 
-    <button id="asignar-btn" onclick="asignarCurso()">Asignar curso seleccionado</button>
+      <label>
+        Email:
+        <input type="email" name="email" required />
+      </label><br />
 
+      <label>
+        Cédula:
+        <input type="text" name="cedula" required />
+      </label><br />
+
+      <label>
+        Horas disponibles:
+       
+        <input type="number" name="horasDisponibles" step="0.01" required />
+      </label><br />
+
+      <button type="submit">Guardar</button>
+    </form>
   </section>
-    <section id="asignados" style="margin-top: 20px;">
+
+  <section id="asignar-curso" style="margin-top: 20px;">
+    <h3>Asignar curso a empleado</h3>
+    <p id="info-empleado">Selecciona un empleado para asignar cursos</p>
+    <select id="curso-sugerido"></select>
+    <button id="btn-asignar">Asignar curso</button>
+  </section>
+
+  <section id="asignados" style="margin-top: 20px;">
     <h3>📚 Cursos asignados</h3>
     <ul id="lista-asignados"></ul>
+    <p id="total-horas"></p>
   </section>
 
-
   <script src="/js/empleados.js"></script>
-</body>
-<a href="/" style="display:inline-block; margin: 15px; padding: 10px 20px; background: #5a4bdb; color: white; text-decoration: none; border-radius: 5px;">
-  ← Volver al Dashboard
-</a>
 
+  <a href="/" style="display:inline-block; margin: 15px; padding: 10px 15px; background: #4b74db; color: white; text-decoration: none; border-radius: 5px;">
+    ← Volver al Dashboard
+  </a>
+</body>
 </html>

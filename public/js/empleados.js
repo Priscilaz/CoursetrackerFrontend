@@ -3,36 +3,128 @@ let horasDisponiblesActuales = 0;
 
 const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
 
-
 async function cargarTablaEmpleados() {
   const tbody = document.getElementById('empleados-body');
   tbody.innerHTML = '';
 
-  const res = await fetch(`${API_BASE}/empleados/listar`);
+  
+  const res = await fetch(`${API_BASE}/empleados`);
   const data = await res.json();
 
   for (const e of data) {
+   
     const resCursos = await fetch(`${API_BASE}/EmpleadoCurso/empleado/${e.empleadoId}`);
     const cursos = await resCursos.json();
-    const horasUsadas = cursos.reduce((sum, curso) => sum + curso.duracionHoras, 0);
-    const horasDisponibles = e.horasDisponibles - horasUsadas;
 
-    const fila = `
-      <tr>
-        <td>${e.nombre}</td>
-        <td>${e.email}</td>
-        <td>${e.cedula}</td>
-        <td>${e.horasDisponibles}h</td>
-        <td>${horasUsadas}h</td>
-        <td>${horasDisponibles > 0 ? horasDisponibles + 'h' : 'No disponible!'}</td>
-        <td>
-          <button onclick="editarEmpleado(${e.empleadoId})">Editar</button>
-          <button onclick="eliminarEmpleado(${e.empleadoId})">Eliminar</button>
-        </td>
-      </tr>
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${e.nombre}</td>
+      <td>${e.email}</td>
+      <td>${e.cedula}</td>
+      <td>${e.horasDisponibles.toFixed(2)}</td>
+      <td>
+        <button onclick="seleccionarEmpleado(${e.empleadoId}, ${e.horasDisponibles})">
+          Ver Cursos
+        </button>
+        <button onclick="cargarEmpleadoParaEditar(${e.empleadoId})">
+          ✏️
+        </button>
+        <button onclick="eliminarEmpleado(${e.empleadoId})">
+          🗑️
+        </button>
+      </td>
     `;
-    tbody.innerHTML += fila;
+    tbody.appendChild(fila);
   }
+}
+
+async function cargarEmpleadoParaEditar(id) {
+  const res = await fetch(`${API_BASE}/empleados/${id}`);
+  if (!res.ok) {
+    alert('No se pudo cargar el empleado para editar.');
+    return;
+  }
+  const e = await res.json();
+  idActual = e.empleadoId;
+  document.getElementById('nombre').value = e.nombre;
+  document.getElementById('email').value = e.email;
+  document.getElementById('cedula').value = e.cedula;
+  document.getElementById('horasDisponibles').value = e.horasDisponibles;
+}
+
+async function eliminarEmpleado(id) {
+  if (!confirm('¿Estás seguro de eliminar este empleado?')) return;
+
+  // ↓ Ruta nueva: DELETE /api/empleados/{id}
+  const res = await fetch(`${API_BASE}/empleados/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) {
+    alert('Error al eliminar empleado ❌');
+    return;
+  }
+  alert('Empleado eliminado ✅');
+  cargarTablaEmpleados();
+}
+
+async function seleccionarEmpleado(id, horasDisponibles) {
+  idActual = id;
+  horasDisponiblesActuales = horasDisponibles;
+  document.getElementById('info-empleado').innerText =
+    `Empleado ID: ${id} - Horas disponibles: ${horasDisponibles.toFixed(2)}`;
+
+  // Mostrar cursos asignados
+  mostrarCursosAsignados(id);
+
+  // Cargar cursos sugeridos (duración ≤ horasDisponibles)
+ 
+  const respuesta = await fetch(`${API_BASE}/empleados/${id}/cursos-recomendados`);
+  const cursos = await respuesta.json();
+
+  const select = document.getElementById('curso-sugerido');
+  select.innerHTML = ''; // limpiar
+
+  if (!Array.isArray(cursos) || cursos.length === 0) {
+    const option = document.createElement('option');
+    option.textContent = '-- Sin cursos disponibles --';
+    option.disabled = true;
+    select.appendChild(option);
+    return;
+  }
+
+  cursos.forEach(c => {
+    const option = document.createElement('option');
+    option.value = c.cursoId;
+    option.textContent = `${c.nombre} (${c.duracionHoras}h)`;
+    select.appendChild(option);
+  });
+}
+
+function mostrarCursosAsignados(idEmpleado) {
+  fetch(`${API_BASE}/EmpleadoCurso/empleado/${idEmpleado}`)
+    .then(res => res.json())
+    .then(cursos => {
+      const lista = document.getElementById('lista-asignados');
+      lista.innerHTML = '';
+      let total = 0;
+
+      if (cursos.length === 0) {
+        lista.innerHTML = '<li>Sin cursos asignados</li>';
+      } else {
+        cursos.forEach(c => {
+          total += c.duracionHoras;
+          const li = document.createElement('li');
+          li.textContent = `${c.nombre} - ${c.duracionHoras}h`;
+          lista.appendChild(li);
+        });
+      }
+
+      document.getElementById('total-horas').innerText =
+        `Total horas asignadas: ${total.toFixed(2)}h`;
+    })
+    .catch(err => {
+      console.error('Error al cargar cursos asignados:', err);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,13 +139,15 @@ document.addEventListener('DOMContentLoaded', () => {
       nombre: formData.get('nombre'),
       email: formData.get('email'),
       cedula: formData.get('cedula'),
-      horasDisponibles: Number(formData.get('horasDisponibles'))
+      // parseFloat para aceptar decimales
+      horasDisponibles: parseFloat(formData.get('horasDisponibles'))
     };
 
     const method = idActual ? 'PUT' : 'POST';
+    
     const url = idActual
-      ? `${API_BASE}/empleados/editar/${idActual}`
-      : `${API_BASE}/empleados/crear`;
+      ? `${API_BASE}/empleados/${idActual}`
+      : `${API_BASE}/empleados`;
 
     try {
       const response = await fetch(url, {
@@ -61,162 +155,59 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoEmpleado)
       });
-
-      if (!response.ok) throw new Error('Error al guardar empleado');
-
+      if (!response.ok) {
+        const errTxt = await response.text();
+        throw new Error(errTxt);
+      }
       alert(idActual ? 'Empleado actualizado ✅' : 'Empleado creado ✅');
-      idActual = null;
       form.reset();
+      idActual = null;
       cargarTablaEmpleados();
-    } catch (err) {
-      console.error(err);
-      alert('Error al guardar empleado ❌');
+    } catch (error) {
+      console.error('Error al guardar empleado:', error);
+      alert('Error al guardar empleado ❌\n' + error.message);
     }
   });
+
+  document.getElementById('btn-asignar').addEventListener('click', () => {
+    const cursoElegido = document.getElementById('curso-sugerido').value;
+    if (!cursoElegido) {
+      alert('Por favor selecciona un curso.');
+      return;
+    }
+
+    // Extraer número decimal de “(Xh)”
+    const texto = document.getElementById('curso-sugerido').selectedOptions[0].textContent;
+    const match = texto.match(/\((\d+(\.\d+)?)h\)/); // captura “X” o “X.Y”
+    const duracion = match ? parseFloat(match[1]) : 0;
+
+    if (duracion > horasDisponiblesActuales) {
+      alert('⛔ El curso seleccionado excede las horas disponibles del empleado');
+      return;
+    }
+
+    const payload = {
+      empleadoId: idActual,
+      cursoId: parseInt(cursoElegido)
+    };
+
+    fetch(`${API_BASE}/EmpleadoCurso/asignar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(res => {
+        if (!res.ok) return res.text().then(t => { throw new Error(t); });
+        return res.json();
+      })
+      .then(() => {
+        alert('Curso asignado correctamente ✅');
+        mostrarCursosAsignados(idActual);
+        cargarTablaEmpleados();
+      })
+      .catch(err => {
+        console.error('Error al asignar curso:', err);
+        alert('Error al asignar curso ❌\n' + err.message);
+      });
+  });
 });
-
-function editarEmpleado(id) {
-  fetch(`${API_BASE}/empleados/listar`)
-    .then(res => res.json())
-    .then(data => {
-      const emp = data.find(e => e.empleadoId === id);
-      if (!emp) return;
-
-      document.querySelector('[name="nombre"]').value = emp.nombre;
-      document.querySelector('[name="email"]').value = emp.email;
-      document.querySelector('[name="cedula"]').value = emp.cedula;
-      document.querySelector('[name="horasDisponibles"]').value = emp.horasDisponibles;
-
-      idActual = id;
-
-      fetch(`${API_BASE}/EmpleadoCurso/empleado/${id}`)
-        .then(res => res.json())
-        .then(cursos => {
-          const totalUsadas = cursos.reduce((sum, c) => sum + c.duracionHoras, 0);
-          horasDisponiblesActuales = emp.horasDisponibles - totalUsadas;
-        });
-
-      fetch(`${API_BASE}/empleados/recomendar-cursos/${id}`)
-        .then(res => res.json())
-        .then(cursos => {
-          const select = document.getElementById('curso-sugerido');
-          select.innerHTML = '';
-
-          if (cursos.length === 0) {
-            const option = document.createElement('option');
-            option.textContent = 'No hay cursos sugeridos';
-            option.disabled = true;
-            select.appendChild(option);
-            return;
-          }
-
-          cursos.forEach(curso => {
-            const option = document.createElement('option');
-            option.value = curso.cursoId;
-            option.textContent = `${curso.nombre} (${curso.duracionHoras}h)`;
-            select.appendChild(option);
-          });
-
-          mostrarCursosAsignados(id);
-        });
-    });
-}
-
-function mostrarCursosAsignados(idEmpleado) {
-  fetch(`${API_BASE}/EmpleadoCurso/empleado/${idEmpleado}`)
-    .then(res => res.json())
-    .then(cursos => {
-      const lista = document.getElementById('lista-asignados');
-      lista.innerHTML = '';
-
-      let totalHoras = 0;
-
-      if (cursos.length === 0) {
-        lista.innerHTML = '<li>Sin cursos asignados</li>';
-      } else {
-        cursos.forEach(curso => {
-          totalHoras += curso.duracionHoras;
-          const li = document.createElement('li');
-          li.textContent = `${curso.nombre} - ${curso.duracionHoras}h`;
-          lista.appendChild(li);
-        });
-      }
-
-      const horasIngresadas = parseFloat(document.querySelector('[name="horasDisponibles"]').value);
-      const restante = horasIngresadas - totalHoras;
-
-      const aviso = document.getElementById('aviso-disponibilidad');
-      const botonAsignar = document.getElementById('asignar-btn');
-      const selectCursos = document.getElementById('curso-sugerido');
-
-      if (restante <= 0) {
-        aviso.textContent = '⚠️ ¡Este empleado ya no tiene horas disponibles!';
-        botonAsignar.disabled = true;
-        selectCursos.innerHTML = '<option>No disponible</option>';
-        selectCursos.disabled = true;
-      } else {
-        aviso.textContent = '';
-        botonAsignar.disabled = false;
-        selectCursos.disabled = false;
-      }
-    })
-    .catch(err => {
-      console.error('Error al obtener cursos asignados:', err);
-    });
-}
-
-function eliminarEmpleado(id) {
-  if (!confirm('¿Estás seguro de eliminar este empleado?')) return;
-
-  fetch(`${API_BASE}/empleados/eliminar/${id}`, {
-    method: 'DELETE'
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Falló la eliminación');
-      alert('Empleado eliminado ✅');
-      cargarTablaEmpleados();
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error al eliminar ❌');
-    });
-}
-
-function asignarCurso() {
-  const cursoId = parseInt(document.getElementById('curso-sugerido').value);
-
-  if (!idActual || !cursoId) {
-    alert('Debes seleccionar un empleado y un curso primero');
-    return;
-  }
-
-  const selected = document.getElementById('curso-sugerido').selectedOptions[0];
-  const texto = selected.textContent;
-  const duracion = parseInt(texto.match(/\d+/)?.[0]);
-
-  if (duracion > horasDisponiblesActuales) {
-    alert('⛔ El curso seleccionado excede las horas disponibles del empleado');
-    return;
-  }
-
-  const payload = { empleadoId: idActual, cursoId };
-
-  fetch(`${API_BASE}/EmpleadoCurso/asignar`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Falló la asignación');
-      return res.json();
-    })
-    .then(() => {
-      alert('Curso asignado correctamente ✅');
-      mostrarCursosAsignados(idActual);
-      cargarTablaEmpleados();
-    })
-    .catch(err => {
-      console.error('Error al asignar curso:', err);
-      alert('Error al asignar curso ❌');
-    });
-}

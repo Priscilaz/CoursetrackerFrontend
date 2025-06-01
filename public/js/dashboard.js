@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
 
-  fetch(`${API_BASE}/cursos/listar`)
+ 
+  fetch(`${API_BASE}/cursos`)
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('tabla-cursos-body');
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <tr>
             <td>${curso.nombre}</td>
             <td>${curso.descripcion}</td>
-            <td>${curso.duracionHoras}h</td>
+            <td>${curso.duracionHoras.toFixed(2)}h</td>
           </tr>
         `;
         tbody.innerHTML += fila;
