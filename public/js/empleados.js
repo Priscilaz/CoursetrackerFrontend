@@ -55,7 +55,7 @@ async function cargarEmpleadoParaEditar(id) {
 async function eliminarEmpleado(id) {
   if (!confirm('¿Estás seguro de eliminar este empleado?')) return;
 
-  // ↓ Ruta nueva: DELETE /api/empleados/{id}
+  
   const res = await fetch(`${API_BASE}/empleados/${id}`, {
     method: 'DELETE'
   });
@@ -140,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
       email: formData.get('email'),
       cedula: formData.get('cedula'),
       // parseFloat para aceptar decimales
-      horasDisponibles: parseFloat(formData.get('horasDisponibles'))
+      horasDisponibles: parseFloat(formData.get('horasDisponibles')),
+      empleadoCursos: [] 
     };
 
     const method = idActual ? 'PUT' : 'POST';
