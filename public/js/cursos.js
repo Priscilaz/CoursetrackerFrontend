@@ -67,7 +67,8 @@ document.getElementById('curso-form').addEventListener('submit', async (e) => {
     nombre: formData.get('nombre'),
     descripcion: formData.get('descripcion'),
     // parseFloat para aceptar decimales
-    duracionHoras: parseFloat(formData.get('duracionHoras'))
+    duracionHoras: parseFloat(formData.get('duracionHoras')),
+    empleadoCursos: []
   };
 
  
