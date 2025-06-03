@@ -1,9 +1,9 @@
-// /js/dashboard.js
-
 document.addEventListener('DOMContentLoaded', () => {
   const API_BASE = 'https://coursetrackerbackend.onrender.com/api';
 
-  
+  // --------------------------------------------------
+  // 1) Cargar y mostrar la tabla de cursos existentes
+  // --------------------------------------------------
   fetch(`${API_BASE}/cursos`)
     .then(res => res.json())
     .then(data => {
@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error al cargar cursos en dashboard:', err);
     });
 
-  // CURSO MAS ASIGNADO
+  // --------------------------------------------------
+  // 2) Mostrar el curso más asignado
+  // --------------------------------------------------
   fetch(`${API_BASE}/Empleados/cursoMasAsignado`)
     .then(async res => {
       if (!res.ok) {
@@ -45,10 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
       infoBox.classList.add('info-box');
       infoBox.innerHTML = '<h3>Curso más asignado</h3>';
 
-      const curso = data.Curso;
+      const curso = data.curso;
       const linea = document.createElement('div');
       linea.classList.add('curso-item');
-      linea.textContent = `${curso.nombre} (ID: ${curso.id}) – Duración: ${curso.duracionHoras}h, Asignaciones: ${data.CantidadAsignaciones}`;
+      linea.textContent = `${curso.nombre} (ID: ${curso.id}) – Duración: ${curso.duracionHoras}h, Asignaciones: ${data.cantidadAsignaciones}`;
       infoBox.appendChild(linea);
 
       contenedor.appendChild(infoBox);
@@ -64,7 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-  //PERSONA LIBRE
+  // --------------------------------------------------
+  // 3) Mostrar la persona con más horas libres
+  // --------------------------------------------------
   fetch(`${API_BASE}/Empleados/personaMasLibre`)
     .then(async res => {
       if (!res.ok) {
@@ -86,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
       infoBox.classList.add('info-box');
       infoBox.innerHTML = '<h3>Persona con más horas libres</h3>';
 
-      const emp = data.Empleado;
+      const emp = data.empleado;
       const linea = document.createElement('div');
       linea.classList.add('curso-item');
-      linea.textContent = `${emp.nombre} (ID: ${emp.id}) – Horas Disponibles: ${emp.horasDisponibles}h, Horas Usadas: ${data.HorasUsadas}h, Horas Libres: ${data.HorasLibres}h`;
+      linea.textContent = `${emp.nombre} (ID: ${emp.id}) – Horas Disponibles: ${emp.horasDisponibles}h, Horas Usadas: ${data.horasUsadas}h, Horas Libres: ${data.horasLibres}h`;
       infoBox.appendChild(linea);
 
       contenedor.appendChild(infoBox);
@@ -105,7 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-  //HORAS POR CURSO
+  // --------------------------------------------------
+  // 4) Mostrar horas asignadas por curso (lista)
+  // --------------------------------------------------
   fetch(`${API_BASE}/Empleados/horasPorCurso`)
     .then(async res => {
       if (!res.ok) {
